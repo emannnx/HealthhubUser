@@ -1,7 +1,7 @@
 FROM ubuntu:latest AS BUILD
 RUN apt-get update
 RUN apt-get install openjdk-17-jdk -y
-COPY . .
+COPY test .
 RUN chmod +x gradlew
 RUN ./gradlew bootJar --no-daemon
 
