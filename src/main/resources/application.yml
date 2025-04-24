@@ -1,0 +1,13 @@
+server:
+    port: 8090
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://imanolabodebello8:Zarmanni%40123@cluster0.ydcgqpx.mongodb.net/your_database_name?retryWrites=true&w=majority
+      database: Users
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
