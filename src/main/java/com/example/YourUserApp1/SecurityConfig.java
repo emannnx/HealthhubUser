@@ -19,7 +19,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for testing
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/home/createuser").permitAll() // Allow user registration
+                        .requestMatchers("/home/createuser", "/home/users", "/home/deleteall").permitAll() // Allow user registration
                         .anyRequest().authenticated() // Require authentication for all other routes
                 )
                 .httpBasic(Customizer.withDefaults()); // Enable basic authentication
