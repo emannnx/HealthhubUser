@@ -1,11 +1,11 @@
-FROM ubuntu:latest AS BUILD
-RUN apt-get update
-RUN apt-get install openjdk-17-jdk -y
+FROM eclipse-temurin:23-jdk as build
+WORKDIR /app
 COPY . .
-RUN chmod +x gradlew
+RUN chmod +x ./gradlew
 RUN ./gradlew bootJar --no-daemon
 
-FROM eclipse-temurin:23
+FROM eclipse-temurin:23-jdk
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
-COPY --from=BUILD /build/libs/YourUserApp1-1.jar app.jar
 ENTRYPOINT ["java", "-jar","app.jar"]
