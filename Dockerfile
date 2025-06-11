@@ -1,6 +1,6 @@
 FROM eclipse-temurin:23-jdk as build
 WORKDIR /app
-COPY src .
+COPY . .
 RUN chmod +x ./gradlew
 RUN ./gradlew bootJar --no-daemon
 
