@@ -1,10 +1,15 @@
 package com.example.YourUserApp1.Model;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +24,6 @@ public class User implements UserDetails {
 
     private int age;
     private String gender;
-
     private int height; // in cm
     private double weight; // in kg
     private double bmi;
@@ -29,8 +33,16 @@ public class User implements UserDetails {
     private int oxygenLevel;
 
     private List<String> medicalConditions;
-
     private boolean familyMedicalHistory;
+
+    @Field("familyHistoryText")
+    private String familyHistoryText;
+
+    @CreatedDate
+    private Instant createdAt;
+
+    @LastModifiedDate
+    private Instant updatedAt;
 
     public User() {}
 
@@ -40,7 +52,7 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public User(String id, String username, String email, String password, int age, String gender, int height, double weight, double bmi, String bloodType, String genotype, int oxygenLevel, List<String> medicalConditions, boolean familyMedicalHistory) {
+    public User(String id, String username, String email, String password, int age, String gender, int height, double weight, String bloodType, String genotype, int oxygenLevel, List<String> medicalConditions, boolean familyMedicalHistory, String familyHistoryText) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -55,6 +67,8 @@ public class User implements UserDetails {
         this.oxygenLevel = oxygenLevel;
         this.medicalConditions = medicalConditions;
         this.familyMedicalHistory = familyMedicalHistory;
+        this.familyHistoryText = familyHistoryText;
+        updateBMI();
     }
 
     // ===== GETTERS & SETTERS =====
@@ -175,6 +189,22 @@ public class User implements UserDetails {
 
     public void setFamilyMedicalHistory(boolean familyMedicalHistory) {
         this.familyMedicalHistory = familyMedicalHistory;
+    }
+
+    public String getFamilyHistoryText() {
+        return familyHistoryText;
+    }
+
+    public void setFamilyHistoryText(String familyHistoryText) {
+        this.familyHistoryText = familyHistoryText;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
     // ===== UserDetails INTERFACE IMPLEMENTATION =====
