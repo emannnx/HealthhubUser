@@ -249,4 +249,11 @@ public class UserService implements UserDetailsService {
         return userRepository.save(existingUser);
     }
 
+    public User updateUserById(String id, User updatedUser) {
+        User existing = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        // set fields...
+        return userRepository.save(existing);
+    }
+
+
 }
