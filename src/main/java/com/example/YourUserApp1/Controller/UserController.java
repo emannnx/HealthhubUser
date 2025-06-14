@@ -14,13 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(
-        origins = {
-                "https://healthcaresyst.netlify.app",
-                "http://localhost:5175"
-        },
-        allowCredentials = "true"
-)
 @RestController
 @RequestMapping("/home")
 public class UserController {
@@ -59,50 +52,70 @@ public class UserController {
 
     @PostMapping("/createuser")
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        if (user.getUsername() == null || user.getUsername().isBlank()) {
-            return ResponseEntity.badRequest().body("Username is required.");
-        }
+        try {
+            if (user.getUsername() == null || user.getUsername().isBlank()) {
+                return ResponseEntity.badRequest().body("Username is required.");
+            }
 
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            return ResponseEntity.badRequest().body("Email is required.");
-        }
+            if (user.getEmail() == null || user.getEmail().isBlank()) {
+                return ResponseEntity.badRequest().body("Email is required.");
+            }
 
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
-        }
+            if (user.getPassword() == null || user.getPassword().isBlank()) {
+                return ResponseEntity.badRequest().body("Password is required.");
+            }
 
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
-        }
+            if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
+            }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt password
-        User savedUser = userService.createUser(user); // Save user via service
-        return ResponseEntity.ok(savedUser);
+            if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists.");
+            }
+
+            user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt password
+            User savedUser = userService.createUser(user); // Save user via service
+            return ResponseEntity.ok(savedUser);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating user: " + e.getMessage());
+        }
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginData) {
-        String email = loginData.get("email");
-        String password = loginData.get("password");
+        try {
+            String email = loginData.get("email");
+            String password = loginData.get("password");
 
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
+            if (email == null || email.isBlank() || password == null || password.isBlank()) {
+                return ResponseEntity.badRequest().body("Email and password are required.");
+            }
+
+            Optional<User> userOpt = userRepository.findByEmail(email);
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
+            }
+
+            User user = userOpt.get();
+            boolean passwordMatch = passwordEncoder.matches(password, user.getPassword());
+
+            if (!passwordMatch) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login successful");
+            response.put("username", user.getUsername());
+            response.put("email", user.getEmail());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Login error: " + e.getMessage());
         }
-
-        User user = userOpt.get();
-        boolean passwordMatch = passwordEncoder.matches(password, user.getPassword());
-
-        if (!passwordMatch) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password.");
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Login successful");
-        response.put("username", user.getUsername());
-        response.put("email", user.getEmail());
-
-        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/deleteall")
@@ -139,7 +152,14 @@ public class UserController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating user");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating user: " + e.getMessage());
         }
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnexpectedErrors(Exception e) {
+        e.printStackTrace(); // helpful during development
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unhandled server error: " + e.getMessage());
     }
 }

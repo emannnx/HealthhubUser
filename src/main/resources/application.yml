@@ -4,5 +4,5 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://imanolabodebello8:Zarmanni%40123@cluster0.ydcgqpx.mongodb.net/userHealthhub?retryWrites=true&w=majority
-#      uri: mongodb+srv://NodStan:Stanleyobi123!@cluster0.q5hehu2.mongodb.net/userHealthhub?retryWrites=true&w=majority&appName=Cluster0
+#      uri: mongodb+srv://imanolabodebello8:Zarmanni%40123@cluster0.ydcgqpx.mongodb.net/userHealthhub?retryWrites=true&w=majority
+      uri: mongodb+srv://NodStan:Stanleyobi123!@cluster0.q5hehu2.mongodb.net/userHealthhub?retryWrites=true&w=majority&appName=Cluster0
