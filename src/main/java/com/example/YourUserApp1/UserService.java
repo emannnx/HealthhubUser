@@ -250,9 +250,47 @@ public class UserService implements UserDetailsService {
     }
 
     public User updateUserById(String id, User updatedUser) {
-        User existing = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        // set fields...
-        return userRepository.save(existing);
+        Optional<User> optionalUser = userRepository.findById(id);
+
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found with username: " + id);
+        }
+
+        User existingUser = optionalUser.get();
+
+        // Check for conflicts
+        if (!existingUser.getUsername().equals(updatedUser.getUsername())
+                && userRepository.findByUsername(updatedUser.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists.");
+        }
+
+        if (!existingUser.getEmail().equals(updatedUser.getEmail())
+                && userRepository.findByEmail(updatedUser.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists.");
+        }
+
+        // Update values
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setAge(updatedUser.getAge());
+        existingUser.setGender(updatedUser.getGender());
+        existingUser.setHeight(updatedUser.getHeight());
+        existingUser.setWeight(updatedUser.getWeight());
+        existingUser.setBloodType(updatedUser.getBloodType());
+        existingUser.setGenotype(updatedUser.getGenotype());
+        existingUser.setOxygenLevel(updatedUser.getOxygenLevel());
+        existingUser.setMedicalConditions(updatedUser.getMedicalConditions());
+
+        existingUser.setFamilyMedicalHistory(updatedUser.isFamilyMedicalHistory());
+        existingUser.setFamilyHistoryText(
+                updatedUser.isFamilyMedicalHistory() ? updatedUser.getFamilyHistoryText() : null
+        );
+
+        // Optional password update
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+        return userRepository.save(existingUser);
     }
 
 
