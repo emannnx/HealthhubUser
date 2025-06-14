@@ -157,16 +157,6 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update/id/{id}")
-    public ResponseEntity<?> updateUserById(@PathVariable String id, @RequestBody User updatedUser) {
-        try {
-            User savedUser = userService.updateUserById(id, updatedUser);
-            return ResponseEntity.ok(savedUser);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with ID: " + id);
-        }
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnexpectedErrors(Exception e) {
         e.printStackTrace(); // helpful during development
