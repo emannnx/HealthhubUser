@@ -253,7 +253,7 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findById(id);
 
         if (optionalUser.isEmpty()) {
-            throw new RuntimeException("User not found with username: " + id);
+            throw new RuntimeException("User not found with ID: " + id);
         }
 
         User existingUser = optionalUser.get();

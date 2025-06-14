@@ -143,7 +143,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{username}")
-    public ResponseEntity<?> updateUser(@PathVariable String username, @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateUserByUsername(@PathVariable String username, @RequestBody User updatedUser) {
         try {
             User savedUser = userService.updateUserByUsername(username, updatedUser);
             return ResponseEntity.ok(savedUser);
@@ -158,9 +158,9 @@ public class UserController {
     }
 
     @PutMapping("/update/id/{id}")
-    public ResponseEntity<?> updateUserById(@PathVariable String id, @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User updatedUser) {
         try {
-            User savedUser = userService.updateUserById(id, updatedUser);
+            User savedUser = userService.updateUser(id, updatedUser);
             return ResponseEntity.ok(savedUser);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found with ID: " + id);
